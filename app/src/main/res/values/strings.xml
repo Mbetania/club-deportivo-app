@@ -1,0 +1,71 @@
+<resources>
+    <string name="app_name">ClubDeportivoApp</string>
+    <string name="usuario">Usuario</string>
+    <string name="club_deportivo_iniciar_sesion">Club Deportivo - Iniciar Sesion</string>
+    <string name="sport_club">Sport Club</string>
+    <string name="clave">Contraseña</string>
+    <string name="forgot_password">Olvidó su contraseña?</string>
+    <string name="sing_in">Iniciar Sesión</string>
+    <string name="dashboard_sport_club">Dashboard - Sport Club</string>
+    <string name="registrar_socio">Registrar Socio</string>
+    <string name="registrar_pago">Registrar Pago</string>
+    <string name="reporte_de_vencimientos">Reporte de Vencimientos</string>
+    <string name="historial_de_cobros">Historial de Cobros</string>
+    <string name="socios_con_cuotas_atrasadas">Socios con cuotas atrasadas:</string>
+    <string name="error_login_default">Usuario o contraseña incorrectos</string>
+    <string name="editar_socio">Editar Socio</string>
+
+    <string name="buscar_socio">Buscar Socio</string>
+    <string name="filtrar_buscar">Filtrar/Buscar Socio</string>
+    <string name="resultados">Resultados</string>
+    <string name="buscar">Buscar</string>
+    <string name="perfil_socio">Perfil de Socio</string>
+    <string name="contacto">Contacto</string>
+    <string name="editar">Editar</string>
+    <string name="datos_personales">Datos Personales</string>
+    <string name="fecha_nacimiento">Fecha de Nacimiento</string>
+    <string name="asociado">Asociado</string>
+    <string name="no_asociado">No Asociado</string>
+    <string name="vencimiento">Vencimiento</string>
+    <string name="ver_clases">Ver Clases</string>
+    <string name="guardar">Guardar</string>
+    <string name="registrar_pago_title">Registrar Pago</string>
+    <string name="deuda">Deuda</string>
+    <string name="al_dia">Al día</string>
+    <string name="monto_pagar">Monto a Pagar</string>
+    <string name="tipo_pago">Tipo de Pago</string>
+    <string name="debito">Débito</string>
+    <string name="credito">Crédito</string>
+    <string name="efectivo">Efectivo</string>
+    <string name="billetera">Billetera Virtual</string>
+    <string name="ultimos_pagos">Últimos Pagos</string>
+    <string name="editado_correctamente">Editado correctamente</string>
+    <string name="mantenimiento_titulo">¡Lo sentimos!</string>
+    <string name="error_empty_search">Ingrese un nombre o DNI para buscar</string>
+    <string name="no_results_found">No se encontraron resultados</string>
+    <string name="codigo_acceso_directo" translatable="false">11111</string>
+    <string-array name="tipos_pago">
+        <item>Efectivo</item>
+        <item>Tarjeta</item>
+        <item>Transferencia</item>
+    </string-array>
+    <string name="mantenimiento_mensaje">Estamos realizando mejoras en esta sección. Por favor, inténtalo nuevamente más tarde.</string>
+    <string name="app_logo_description">App logo</string>
+    <string name="bienvenido">Bienvenida/o</string>
+    <string name="socio_placeholder">Socio Nombre Apellido</string>
+    <string name="detalle_pago_placeholder">Pago $999.99 - Método</string>
+    <string name="fecha_placeholder">01/01/2025</string>
+    <string name="detalle_pago">pagó %1$s - %2$s</string>
+    <string name="volver">Volver</string>
+    <string name="reporte_vencimientos_cuotas">Reporte de Vencimientos de Cuotas</string>
+    <string name="descargar_reporte_pdf">Descargar Reporte en PDF</string>
+    <string name="vencimiento_placeholder">Cuota vencida $x.xx</string>
+    <string name="detalle_vencimiento">Cuota vencida %1$s</string>
+    <string name="registro_generado">Registro generado</string>
+    <string name="nombre_archivo_placeholder">reporte_vencimientos-fecha.pdf</string>
+    <string name="leyenda_reporte">Encontrará el reporte en sus archivos</string>
+    <string name="leyenda_guardar">Los datos fueron guardados</string>
+
+    <string name="cerrar">Cerrar</string>
+
+</resources>

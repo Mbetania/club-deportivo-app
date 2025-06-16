@@ -1,0 +1,21 @@
+/build
+# Carpetas de compilación
+/build/
+/.idea/
+/.gradle/
+/captures/
+/local.properties
+
+# Archivos generados
+*.iml
+*.apk
+*.dex
+*.log
+*.class
+
+# Configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos personales
+*.keystore
