@@ -1,41 +1,59 @@
 package com.grupo12.clubdeportivoapp
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
 import com.grupo12.clubdeportivoapp.databinding.ActivityHistorialPagosSocioBinding
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HistorialPagosSocioActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistorialPagosSocioBinding
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dniSocio: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHistorialPagosSocioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configurar RecyclerView con datos de ejemplo
-        val pagos = listOf(
-            Pago("Socio Juan Pérez", "$100.00", "Efectivo", "2025-05-01"),
-            Pago("Socio Ana Gómez", "$150.00", "Tarjeta", "2025-05-02"),
-            Pago("Socio Carlos López", "$200.00", "Transferencia", "2025-05-03")
-        )
-
-        binding.rvHistorialPagos.layoutManager = LinearLayoutManager(this)
-        binding.rvHistorialPagos.adapter = PagoAdapter(pagos)
-
-        // Botón Volver
-        binding.btnBack.setOnClickListener {
+        dbHelper = DatabaseHelper(this)
+        dniSocio = intent.getStringExtra("dni_socio") ?: run {
+            Toast.makeText(this, "DNI no proporcionado", Toast.LENGTH_SHORT).show()
             finish()
+            return
         }
 
-        // Botón Descargar Reporte (mostrar modal)
+        setupViews()
+        cargarHistorialPagos()
+    }
+
+    private fun cargarHistorialPagos() {
+        val pagos = dbHelper.obtenerHistorialPagos(dniSocio)
+
+        if (pagos.isEmpty()) {
+            binding.tvEmptyState.visibility = View.VISIBLE
+            binding.rvHistorialPagos.visibility = View.GONE
+            binding.btnDescargarReporte.visibility = View.GONE
+        } else {
+            binding.tvEmptyState.visibility = View.GONE
+            binding.rvHistorialPagos.visibility = View.VISIBLE
+            binding.btnDescargarReporte.visibility = View.VISIBLE
+
+            binding.rvHistorialPagos.layoutManager = LinearLayoutManager(this)
+            binding.rvHistorialPagos.adapter = PagoAdapter(pagos)
+        }
+    }
+
+    private fun setupViews() {
+        binding.btnBack.setOnClickListener { finish() }
+
         binding.btnDescargarReporte.setOnClickListener {
+            // Lógica para generar reporte PDF
             showReporteGeneradoDialog()
         }
     }
@@ -46,11 +64,11 @@ class HistorialPagosSocioActivity : AppCompatActivity() {
             .setView(dialogView)
             .create()
 
-        // Configurar nombre del archivo con fecha actual
-        val currentDate = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
-        dialogView.findViewById<TextView>(R.id.tv_nombre_archivo).text = "reporte_pagos-$currentDate.pdf"
+        val currentDate = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        dialogView.findViewById<TextView>(R.id.tv_nombre_archivo).text =
+            "reporte_pagos_${dniSocio}_$currentDate.pdf"
 
-        // Botón Cerrar
         dialogView.findViewById<Button>(R.id.btn_cerrar).setOnClickListener {
             dialog.dismiss()
         }

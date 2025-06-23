@@ -19,7 +19,7 @@ class SocioAdapter(
 
         val socio = getItem(position) ?: return view
         val textView = view.findViewById<TextView>(android.R.id.text1)
-        textView.text = "${socio.nombre} ${socio.apellido} - DNI: ${socio.dni}"
+        textView.text = "${socio.nombreCompleto} ${socio.apellido} - DNI: ${socio.dni}"
         textView.setTextColor(context.getColor(R.color.primary_text))
 
         view.setOnClickListener { onItemClick(socio) }

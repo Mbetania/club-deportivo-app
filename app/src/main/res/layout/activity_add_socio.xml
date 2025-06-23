@@ -104,6 +104,26 @@
                     android:paddingHorizontal="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Campo Alias añadido -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                style="@style/roundedInput"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="@color/input_background"
+                app:boxStrokeColor="@color/primary_color">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAlias"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Alias"
+                    android:textColor="@color/primary_text"
+                    android:textColorHint="@color/secondary_text"
+                    android:paddingHorizontal="16dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
             <Button
                 android:id="@+id/btnRegistrar"
                 android:layout_width="match_parent"

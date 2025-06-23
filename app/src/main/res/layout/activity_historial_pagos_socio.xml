@@ -7,13 +7,12 @@
     android:background="@color/background"
     android:fitsSystemWindows="true">
 
-    <!-- Barra de estado -->
-
     <!-- Contenido con Scroll -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,30 +29,39 @@
 
             <!-- Subtítulo -->
             <TextView
-                android:id="@+id/tv_subtitulo"
+                android:id="@+id/tvSubtitulo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Historial de Pagos"
-                android:textColor="@color/primary_text"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
+                style="@style/TextAppearance.Title"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Mensaje cuando no hay datos -->
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No se encontraron pagos registrados"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone"
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp"/>
 
             <!-- RecyclerView (lista de pagos) -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_historial_pagos"
+                android:id="@+id/rvHistorialPagos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"/>
 
             <!-- Botón para exportar PDF -->
             <Button
-                android:id="@+id/btn_descargar_reporte"
+                android:id="@+id/btnDescargarReporte"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Descargar Reporte en PDF"
-                android:backgroundTint="@color/primary_color"
-                android:textColor="@color/white"/>
+                style="@style/Button.Primary"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

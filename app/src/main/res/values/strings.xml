@@ -68,4 +68,46 @@
 
     <string name="cerrar">Cerrar</string>
 
+    <!-- En res/values/strings.xml -->
+    <string-array name="ubicaciones">
+        <item>Salón de clases</item>
+        <item>Salón de musculación</item>
+        <item>Exterior</item>
+    </string-array>
+
+    <string-array name="clases_salon">
+        <item>Yoga</item>
+        <item>Funcional</item>
+        <item>Boxeo</item>
+        <item>Localizada</item>
+    </string-array>
+
+    <string-array name="clases_exterior">
+        <item>Hockey</item>
+        <item>Básquet</item>
+        <item>Fútbol</item>
+    </string-array>
+
+    <string-array name="frecuencias">
+        <item>Por clase</item>
+        <item>2 veces por semana</item>
+        <item>3 veces por semana</item>
+        <item>Pase libre</item>
+    </string-array>
+
+    <string-array name="metodos_pago">
+        <item>Efectivo</item>
+        <item>Mercado Pago (+5%)</item>
+        <item>Banco Provincia (-10%)</item>
+        <item>Transferencia</item>
+        <item>Tarjeta de crédito (3 meses mínimo)</item>
+    </string-array>
+
+    <string-array name="meses_pago">
+        <item>1 mes</item>
+        <item>3 meses</item>
+        <item>6 meses</item>
+        <item>12 meses</item>
+    </string-array>
+
 </resources>

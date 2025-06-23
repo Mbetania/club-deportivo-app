@@ -9,57 +9,38 @@ import com.grupo12.clubdeportivoapp.databinding.ActivityPerfilSocioBinding
 
 class PerfilSocioActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPerfilSocioBinding
+    private val dbHelper: DatabaseHelper by lazy { DatabaseHelper(this) }
+    private lateinit var socio: Socio
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPerfilSocioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Socio hardcodeado con todos los campos requeridos
-        val socioHardcodeado = Socio(
-            nombre = "Juan",
-            apellido = "Pérez",
-            dni = "12345678",
-            telefono = "555-1234",
-            email = "juan.perez@example.com",
-            fechaNacimiento = "01/01/1980",
-            asociado = true,
-            vencimiento = "31/12/2023"
-        )
+        val dniSocio = intent.getStringExtra("dni_socio") ?: run {
+            Toast.makeText(this, "DNI no proporcionado", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
+        val socio = dbHelper.obtenerSocioPorDni(dniSocio) ?: run {
+            Toast.makeText(this, "Socio no encontrado", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
 
         with(binding) {
-            // Botón Atrás
-            btnBack.setOnClickListener {
-                finish()
-            }
+            tvNombre.text = socio.nombreCompleto
+            tvDni.text = "DNI: ${socio.dni}"
+            // Puedes agregar más campos aquí según necesites
 
-            // Botón Editar
-            btnEditar.setOnClickListener {
-                mostrarMensaje("Funcionalidad de edición en desarrollo")
-            }
+            btnBack.setOnClickListener { finish() }
 
-            // Botón Ver Clases - Navega a MantenimientoActivity
-            btnVerClases.setOnClickListener {
-                startActivity(Intent(this@PerfilSocioActivity, MantenimientoActivity::class.java))
-            }
-
-            // Botón Guardar
-            btnGuardar.setOnClickListener {
-                showDatosGuardadosDialog()
-            }
-
-            // Botón Registrar Pago - Navega a RegistrarPagoActivity
             btnRegistrarPago.setOnClickListener {
-                startActivity(
-                    Intent(this@PerfilSocioActivity, RegistrarPagoActivity::class.java).apply {
-                        putExtra("socio", socioHardcodeado)
-                    }
-                )
+                startActivity(Intent(this@PerfilSocioActivity, RegistrarPagoActivity::class.java).apply {
+                    putExtra("dni_socio", socio.dni)
+                })
             }
-
-            // Mostrar datos del socio
-            tvNombre.text = "${socioHardcodeado.nombre} ${socioHardcodeado.apellido}"
-            tvDni.text = "DNI: ${socioHardcodeado.dni}"
         }
     }
 
