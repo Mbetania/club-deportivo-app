@@ -14,7 +14,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         const val DATABASE_NAME = "club_deportivo.db"
-        const val DATABASE_VERSION = 8
+        const val DATABASE_VERSION = 9
 
         const val TABLE_USUARIOS = "usuarios"
         const val COLUMN_USER_ID = "id"
@@ -50,7 +50,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $COLUMN_NOMBRE TEXT NOT NULL,
                 $COLUMN_ALIAS TEXT UNIQUE NOT NULL,
                 $COLUMN_DNI TEXT UNIQUE NOT NULL,
-                $COLUMN_VENCIMIENTO TEXT
+                $COLUMN_VENCIMIENTO TEXT,
+                $COLUMN_MONTO REAL NOT NULL,
+                $COLUMN_FECHA_PAGO TEXT NOT NULL,
+                tipo_pago TEXT,              
+                actividad TEXT,               
+                frecuencia TEXT,              
+                meses_pagados INTEGER,       
+                FOREIGN KEY ($COLUMN_DNI) REFERENCES $TABLE_SOCIOS($COLUMN_DNI)
             )
         """)
 
@@ -141,10 +148,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_USUARIOS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SOCIOS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PAGOS")
-        onCreate(db)
+        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN tipo_pago TEXT")
+        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN actividad TEXT")
+        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN frecuencia TEXT")
+        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN meses_pagados INTEGER")
     }
 
 
