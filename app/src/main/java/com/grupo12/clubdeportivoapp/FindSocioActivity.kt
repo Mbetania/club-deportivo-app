@@ -69,7 +69,6 @@ class FindSocio : AppCompatActivity() {
         val pagos = dbHelper.obtenerHistorialPagos(dni)
 
         if (socio != null) {
-            // Obtener información del último pago
             val ultimoPago = if (pagos.isNotEmpty()) pagos[0] else null
 
             val mensaje = buildString {
