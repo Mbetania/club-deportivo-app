@@ -1,6 +1,5 @@
 package com.grupo12.clubdeportivoapp
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -43,7 +42,6 @@ class RegistrarPagoActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        // Configurar Spinners
         binding.spUbicacion.adapter = ArrayAdapter.createFromResource(
             this, R.array.ubicaciones, android.R.layout.simple_spinner_item
         ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
@@ -99,7 +97,6 @@ class RegistrarPagoActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { finish() }
 
-        // Calcular monto inicial
         calcularMonto()
         actualizarFechaVencimiento()
     }
@@ -133,7 +130,6 @@ class RegistrarPagoActivity : AppCompatActivity() {
         val metodoPago = binding.spMetodoPago.selectedItem.toString()
         val mesesSeleccionados = binding.spMeses.selectedItem.toString().split(" ")[0].toInt()
 
-        // Calcular monto base mensual según ubicación y frecuencia
         val montoMensual = when (ubicacion) {
             "Exterior" -> when (frecuencia) {
                 "Por clase" -> 15.0
@@ -141,7 +137,7 @@ class RegistrarPagoActivity : AppCompatActivity() {
                 "3 veces por semana" -> 35.0
                 else -> 40.0 // Pase libre
             }
-            else -> when (frecuencia) { // Para salón de clases y musculación
+            else -> when (frecuencia) {
                 "Por clase" -> 10.0
                 "2 veces por semana" -> 25.0
                 "3 veces por semana" -> 30.0
@@ -149,14 +145,12 @@ class RegistrarPagoActivity : AppCompatActivity() {
             }
         }
 
-        // Aplicar ajustes por método de pago al monto mensual
         val montoMensualFinal = when {
             metodoPago.contains("Mercado Pago") -> montoMensual * 1.05
             metodoPago.contains("Banco Provincia") -> montoMensual * 0.90
             else -> montoMensual
         }
 
-        // Calcular monto total por los meses seleccionados
         montoBase = montoMensualFinal * mesesSeleccionados
 
         binding.tvMontoCalculado.text = "$${"%.2f".format(montoBase)} (${mesesSeleccionados} mes/es)"
@@ -175,7 +169,7 @@ class RegistrarPagoActivity : AppCompatActivity() {
     private fun calcularVencimiento(meses: Int): String {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.MONTH, meses)
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Formato ISO
         return dateFormat.format(calendar.time)
     }
 
@@ -199,6 +193,7 @@ class RegistrarPagoActivity : AppCompatActivity() {
         )
 
         if (success) {
+            dbHelper.verificarPagos(dniSocio)
             Toast.makeText(this, "Pago registrado exitosamente", Toast.LENGTH_SHORT).show()
             finish()
         } else {

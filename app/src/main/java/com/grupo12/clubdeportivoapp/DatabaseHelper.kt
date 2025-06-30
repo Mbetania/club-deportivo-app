@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import androidx.compose.ui.text.intl.Locale
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -14,7 +13,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         const val DATABASE_NAME = "club_deportivo.db"
-        const val DATABASE_VERSION = 9
+        const val DATABASE_VERSION = 10
 
         const val TABLE_USUARIOS = "usuarios"
         const val COLUMN_USER_ID = "id"
@@ -30,11 +29,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_VENCIMIENTO = "vencimiento"
 
         const val TABLE_PAGOS = "pagos"
+        const val COLUMN_PAGO_ID = "id"
+        const val COLUMN_DNI_PAGO = "dni"
         const val COLUMN_MONTO = "monto"
         const val COLUMN_FECHA_PAGO = "fecha_pago"
+        const val COLUMN_TIPO_PAGO = "tipo_pago"
+        const val COLUMN_ACTIVIDAD = "actividad"
+        const val COLUMN_FRECUENCIA = "frecuencia"
+        const val COLUMN_MESES_PAGADOS = "meses_pagados"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
+
         db.execSQL("""
             CREATE TABLE $TABLE_USUARIOS (
                 $COLUMN_USER_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,32 +50,77 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """)
 
+
         db.execSQL("""
             CREATE TABLE $TABLE_SOCIOS (
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COLUMN_NOMBRE TEXT NOT NULL,
                 $COLUMN_ALIAS TEXT UNIQUE NOT NULL,
                 $COLUMN_DNI TEXT UNIQUE NOT NULL,
-                $COLUMN_VENCIMIENTO TEXT,
-                $COLUMN_MONTO REAL NOT NULL,
-                $COLUMN_FECHA_PAGO TEXT NOT NULL,
-                tipo_pago TEXT,              
-                actividad TEXT,               
-                frecuencia TEXT,              
-                meses_pagados INTEGER,       
-                FOREIGN KEY ($COLUMN_DNI) REFERENCES $TABLE_SOCIOS($COLUMN_DNI)
+                $COLUMN_VENCIMIENTO TEXT
             )
         """)
 
+
         db.execSQL("""
             CREATE TABLE $TABLE_PAGOS (
-                $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_DNI TEXT NOT NULL,
+                $COLUMN_PAGO_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_DNI_PAGO TEXT NOT NULL,
                 $COLUMN_MONTO REAL NOT NULL,
                 $COLUMN_FECHA_PAGO TEXT NOT NULL,
-                FOREIGN KEY ($COLUMN_DNI) REFERENCES $TABLE_SOCIOS($COLUMN_DNI)
+                $COLUMN_TIPO_PAGO TEXT,
+                $COLUMN_ACTIVIDAD TEXT,
+                $COLUMN_FRECUENCIA TEXT,
+                $COLUMN_MESES_PAGADOS INTEGER,
+                FOREIGN KEY ($COLUMN_DNI_PAGO) REFERENCES $TABLE_SOCIOS($COLUMN_DNI)
             )
         """)
+
+
+        crearUsuarioAdmin()
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        try {
+
+            if (oldVersion < 2) {
+
+            }
+
+
+            if (oldVersion < 10) {
+                addColumnIfNotExists(db, TABLE_PAGOS, COLUMN_TIPO_PAGO, "TEXT")
+                addColumnIfNotExists(db, TABLE_PAGOS, COLUMN_ACTIVIDAD, "TEXT")
+                addColumnIfNotExists(db, TABLE_PAGOS, COLUMN_FRECUENCIA, "TEXT")
+                addColumnIfNotExists(db, TABLE_PAGOS, COLUMN_MESES_PAGADOS, "INTEGER")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error durante la migración de BD", e)
+        }
+    }
+
+
+    private fun addColumnIfNotExists(db: SQLiteDatabase, table: String, column: String, type: String) {
+        if (!isColumnExists(db, table, column)) {
+            db.execSQL("ALTER TABLE $table ADD COLUMN $column $type")
+            Log.d("DatabaseHelper", "Columna $column agregada a $table")
+        }
+    }
+
+
+    private fun isColumnExists(db: SQLiteDatabase, table: String, column: String): Boolean {
+        db.rawQuery("PRAGMA table_info($table)", null).use { cursor ->
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                    if (name == column) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
     }
 
     fun crearUsuarioAdmin() {
@@ -80,6 +131,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             VALUES ('admin', '1234', 1)
         """)
     }
+
 
     fun isAliasUnique(alias: String): Boolean {
         val db = readableDatabase
@@ -99,7 +151,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_NOMBRE, nombre)
             put(COLUMN_ALIAS, alias)
             put(COLUMN_DNI, dni)
-            put(COLUMN_VENCIMIENTO, "") // Vencimiento vacío inicial
+            put(COLUMN_VENCIMIENTO, "")
         }
         return db.insert(TABLE_SOCIOS, null, valores)
     }
@@ -117,7 +169,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return try {
             db.beginTransaction()
 
-            // 1. Registrar el pago
             val valoresPago = ContentValues().apply {
                 put(COLUMN_DNI, dniSocio)
                 put(COLUMN_MONTO, monto)
@@ -129,8 +180,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             }
             db.insert(TABLE_PAGOS, null, valoresPago)
 
-            // 2. Actualizar vencimiento del socio (siempre suma meses)
-            val nuevaFecha = LocalDate.now().plusMonths(mesesPagados.toLong()).toString()
+            val nuevaFecha = LocalDate.parse(
+                fechaVencimiento.split("/").reversed().joinToString("-")
+            ).toString()
+
             db.update(
                 TABLE_SOCIOS,
                 ContentValues().apply { put(COLUMN_VENCIMIENTO, nuevaFecha) },
@@ -141,19 +194,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             db.setTransactionSuccessful()
             true
         } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error al registrar pago", e)
             false
         } finally {
             db.endTransaction()
         }
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN tipo_pago TEXT")
-        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN actividad TEXT")
-        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN frecuencia TEXT")
-        db.execSQL("ALTER TABLE $TABLE_PAGOS ADD COLUMN meses_pagados INTEGER")
+    fun verificarPagos(dni: String) {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_PAGOS WHERE $COLUMN_DNI = ?", arrayOf(dni))
+        Log.d("DatabaseHelper", "Pagos encontrados para $dni: ${cursor.count}")
+        cursor.use {
+            while (it.moveToNext()) {
+                Log.d("DatabaseHelper", "Pago: ${it.getString(it.getColumnIndexOrThrow(COLUMN_FECHA_PAGO))}")
+            }
+        }
     }
-
 
     fun existeAlias(alias: String): Boolean {
         val db = readableDatabase
@@ -261,6 +318,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     fun obtenerHistorialPagos(dniSocio: String): List<HistorialPago> {
+        Log.d("DatabaseHelper", "Buscando pagos para DNI: $dniSocio")
         val db = readableDatabase
         val pagos = mutableListOf<HistorialPago>()
 
@@ -294,7 +352,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return pagos
     }
 
-    // Obtener socios con vencimientos próximos (7 días)
     fun obtenerSociosConVencimientosProximos(): List<SocioVencimiento> {
         val db = readableDatabase
         val socios = mutableListOf<SocioVencimiento>()
@@ -358,7 +415,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return socios
     }
 
-    // En DatabaseHelper.kt
     fun obtenerInformacionCompletaSocio(dni: String): SocioCompleto? {
         val db = readableDatabase
 
@@ -377,8 +433,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val partesNombre = nombreCompleto.split(" ")
                 val nombre = partesNombre.firstOrNull() ?: ""
                 val apellido = partesNombre.drop(1).joinToString(" ")
-
-                // Obtener el último pago registrado
+                
                 val pagoCursor = db.query(
                     TABLE_PAGOS,
                     arrayOf("actividad", "frecuencia", "meses_pagados"),
